@@ -1,4 +1,4 @@
-# cario-base64
+# cairo-base64
 
 A library for base64 encoding multi character ascii felts.
 
