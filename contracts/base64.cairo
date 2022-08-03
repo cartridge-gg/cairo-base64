@@ -8,6 +8,41 @@ from starkware.cairo.common.bitwise import bitwise_and, bitwise_or
 from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 
 namespace Base64:
+    func encode_array{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(str_len: felt, str: felt*) -> (encoded_str_len: felt, encoded_str: felt*):
+        alloc_locals
+
+        let (encoded_str: felt*) = alloc()
+        let (len) = _recursive_encode_array(str_len, str, 0, encoded_str)
+
+        return (encoded_str_len=len, encoded_str=encoded_str)
+    end
+
+    func _recursive_encode_array{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(str_len: felt, str: felt*, encoded_str_len: felt, encoded_str: felt*) -> (len: felt):
+        alloc_locals
+        %{ print(ids.str_len, ids.encoded_str_len) %}
+        if str_len == 0:
+            return (encoded_str_len)
+        end
+
+        let (encoded_substr: felt*) = alloc()
+        let part = str[0]
+        let (offset, padding) = offset_padding(part)
+        %{ print(ids.part, ids.str_len, ids.offset, ids.padding) %}
+        let (len) = _recursive_encode3(part * offset, padding, 0, encoded_substr)
+
+        if str_len == 1:
+            %{ print(ids.len) %}
+            memcpy(encoded_str + encoded_str_len, encoded_substr + 28 - len, len)
+            %{ print("ah", ids.len) %}
+            return _recursive_encode_array(str_len - 1, str + 1, encoded_str_len + len, encoded_str)
+        else:
+            %{ print(ids.len) %}
+            memcpy(encoded_str + encoded_str_len, encoded_substr + 28 - len, len - padding)
+            %{ print("ah", ids.len) %}
+            return _recursive_encode_array(str_len - 1, str + 1, encoded_str_len + len - padding, encoded_str)
+        end
+    end
+
     func encode_single{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(str: felt) -> (encoded_str_len: felt, encoded_str: felt*):
         alloc_locals
 
