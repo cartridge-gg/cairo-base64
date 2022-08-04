@@ -26,7 +26,7 @@ namespace Base64:
         let (encoded_substr: felt*) = alloc()
         let part = str[0]
         let (offset, padding) = offset_padding(part)
-        let (len) = _encode3_inner(part * offset, padding, 0, encoded_substr)
+        let (len) = _encode3_inner(part * offset, padding, 0, 0)
 
         if str_len == 1:
             memcpy(encoded_str + encoded_str_len, encoded_substr + 28 - len, len)
@@ -94,18 +94,22 @@ namespace Base64:
     func encode3{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(a0: felt, a1: felt, a2: felt) -> (c0: felt, c1: felt, c2: felt, c3: felt):
         alloc_locals
 
-        let (r10) = leftshift(a2, 16)
-        let (r11) = leftshift(a1, 8)
-        let (n0) = bitwise_or(r10, r11)
+        let (_, r00) = unsigned_div_rem(a2, 2 ** 16)
+        let r01 = r00 * 2 ** 16
+
+        let (_, r10) = unsigned_div_rem(a1, 2 ** 24)
+        let r11 = r10 * 2 ** 8
+
+        let (n0) = bitwise_or(r01, r11)
         let (n) = bitwise_or(n0, a0)
 
-        let (c00) = rightshift(n, 18)
+        let (c00, _) = unsigned_div_rem(n, 2 ** 18)
         let (c01) = bitwise_and(c00, 63)
 
-        let (c10) = rightshift(n, 12)
+        let (c10, _) = unsigned_div_rem(n, 2 ** 12)
         let (c11) = bitwise_and(c10, 63)
 
-        let (c20) = rightshift(n, 6)
+        let (c20, _) = unsigned_div_rem(n, 2 ** 6)
         let (c21) = bitwise_and(c20, 63)
 
         let (c30) = bitwise_and(n, 63)
@@ -119,10 +123,6 @@ namespace Base64:
     end
 
     func lookup{range_check_ptr}(index: felt) -> (value: felt):
-        let (is_index_le_63) = is_le(index, 63)
-
-        assert is_index_le_63 = 1
-
         let (table) = get_label_location(BASE64)
         return ([table + index])
 
@@ -209,38 +209,8 @@ namespace Base64:
             return (1, 0)
         end
 
-        let (truncated) = rightshift(n, 24)
+        let (truncated, _) = unsigned_div_rem(n, 2 ** 24)
         return offset_padding(truncated)
-    end
-
-    func rightshift{range_check_ptr}(word : felt, n : felt) -> (word : felt):
-        # Shift bits to the right and lose values
-        #
-        # Parameters:
-        #    word: A 32-bits word
-        #    n: The amount of bits to shift
-        #
-        # Returns:
-        #    word: The word with the last n bits shifted.
-        let (divisor) = pow2(n)
-        let (p, _) = unsigned_div_rem(word, divisor)
-        return (p)
-    end
-
-    func leftshift{range_check_ptr}(word: felt, n: felt) -> (word: felt):
-        # Shift bits to the left and lose values
-        #
-        # Parameters:
-        #    word: A 32-bits word
-        #    n: The amount of bits to shift
-        #
-        # Returns:
-        #    word: The word with the first n bits shifted.
-        alloc_locals
-        let (divisor) = pow2(32 - n)
-        let (_, r) = unsigned_div_rem(word, divisor)
-        let (multiplicator) = pow2(n)
-        return (multiplicator * r)
     end
 
     func pow2{range_check_ptr}(i) -> (res):

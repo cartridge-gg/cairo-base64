@@ -9,7 +9,7 @@ from starkware.cairo.common.alloc import alloc
 from contracts.base64 import Base64
 
 @view
-func test_base64_single{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+func test_base64_encode_single{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     alloc_locals
 
     let (e0) = Base64.encode_single('Man')
@@ -45,8 +45,23 @@ func test_base64_single{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     let (e10) = Base64.encode_single('abcdefghijk')
     assert e10 = 'YWJjZGVmZ2hpams='
 
-    # let (e11) = Base64.encode_single('Many hands make ')
-    # assert e11 = 'TWFueSBoYW5kcyBtYWtlIA=='
-
     return ()
 end
+
+# steps=17839
+# steps=16071
+# steps=12328
+
+# @view
+# func test_base64_encode_array{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
+#     alloc_locals
+
+#     let (man) = alloc()
+#     assert man[0] = 'M'
+#     assert man[1] = 'a'
+#     assert man[2] = 'n'
+
+#     let (encoded_str_len, encoded_str) = Base64.encode_array('Man')
+#     let e0 = encoded_str[0]
+#     assert e0 = 'TWFu'
+# end
