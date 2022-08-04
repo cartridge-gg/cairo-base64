@@ -30,7 +30,7 @@ async def test_base64(starknet):
 async def test_base64_encode(test_base64):
     cases = [
         # (['Man'], "TWFu"),
-        (['M', 'a', 'n'], "TWFu"),
+        # (['M', 'a', 'n'], "TWFu"),
         # (['Ma'], "TWE="),
         # (['M'], "TQ=="),
         # (['abcd'], "YWJjZA=="),

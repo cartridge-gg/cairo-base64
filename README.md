@@ -16,4 +16,11 @@ A library for base64 encoding multi character ascii felts.
 'abcdefghijk' => "YWJjZGVmZ2hpams=
 ```
 
+## Usage
+
+```
+let (encoded) = Base64.encode_single('abcdefghij')
+assert encoded = 'YWJjZGVmZ2hpag=='
+```
+
 TODO: Support felt arrays.

@@ -12,30 +12,41 @@ from contracts.base64 import Base64
 func test_base64_single{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
     alloc_locals
 
-    let (input) = alloc()
-    assert input[0] = 'Man'
+    let (e0) = Base64.encode_single('Man')
+    assert e0 = 'TWFu'
 
-    let (encoded_str_len, encoded_str) = Base64.encode_single('Man')
+    let (e1) = Base64.encode_single('Ma')
+    assert e1 = 'TWE='
 
-    let a = encoded_str[0]
-    assert a = 'TWFu'
+    let (e2) = Base64.encode_single('M')
+    assert e2 = 'TQ=='
+
+    let (e3) = Base64.encode_single('abcd')
+    assert e3 = 'YWJjZA=='
+
+    let (e4) = Base64.encode_single('abcde')
+    assert e4 = 'YWJjZGU='
+
+    let (e5) = Base64.encode_single('abcdef')
+    assert e5 = 'YWJjZGVm'
+
+    let (e6) = Base64.encode_single('abcdefg')
+    assert e6 = 'YWJjZGVmZw=='
+
+    let (e7) = Base64.encode_single('abcdefgh')
+    assert e7 = 'YWJjZGVmZ2g='
+
+    let (e8) = Base64.encode_single('abcdefghi')
+    assert e8 = 'YWJjZGVmZ2hp'
+
+    let (e9) = Base64.encode_single('abcdefghij')
+    assert e9 = 'YWJjZGVmZ2hpag=='
+
+    let (e10) = Base64.encode_single('abcdefghijk')
+    assert e10 = 'YWJjZGVmZ2hpams='
+
+    # let (e11) = Base64.encode_single('Many hands make ')
+    # assert e11 = 'TWFueSBoYW5kcyBtYWtlIA=='
 
     return ()
 end
-
-# @view
-# func test_base64_array{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
-#     alloc_locals
-
-#     let (input) = alloc()
-#     assert input[0] = 'M'
-#     assert input[1] = 'a'
-#     assert input[2] = 'n'
-
-#     let (encoded_str_len, encoded_str) = Base64.encode_array(3, input)
-
-#     let a = encoded_str[0]
-#     assert a = 'TWFu'
-
-#     return ()
-# end
