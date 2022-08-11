@@ -3,7 +3,7 @@ from starkware.cairo.common.memcpy import memcpy
 from starkware.cairo.common.registers import get_label_location
 from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 
-from src.library import _encode3_inner, calc_offset_padding
+from src.library import encode3, _encode3_inner, calc_offset_padding
 
 namespace Base64:
     # func encode_array{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(str_len: felt, str: felt*) -> (encoded_str_len: felt, encoded_str: felt*):
@@ -50,6 +50,12 @@ namespace Base64:
         let (encoded_str) = _encode3_inner(str * offset, padding, 0, 0, cb)
 
         return (encoded_str=encoded_str)
+    end
+
+    func encode3{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(value: felt) -> (c0: felt, c1: felt, c2: felt, c3: felt, r: felt):
+        alloc_locals
+        let (cb) = get_label_location(lookup)
+        return encode3(value, cb)
     end
 
     func lookup{range_check_ptr}(index: felt) -> (value: felt):
