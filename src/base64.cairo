@@ -26,16 +26,21 @@ namespace Base64:
         let (encoded_substr: felt*) = alloc()
         let part = str[0]
         let (offset, padding) = offset_padding(part)
-        let (len) = _encode3_inner(part * offset, padding, 0, 0)
+        
+        %{ print(ids.offset, ids.padding, ids.str_len) %}
 
-        if str_len == 1:
-            memcpy(encoded_str + encoded_str_len, encoded_substr + 28 - len, len)
-            return _encode_array_inner(str_len - 1, str + 1, encoded_str_len + len, encoded_str)
-        else:
-            %{ print(ids.len) %}
-            memcpy(encoded_str + encoded_str_len, encoded_substr + 28 - len, len - padding)
-            return _encode_array_inner(str_len - 1, str + 1, encoded_str_len + len - padding, encoded_str)
-        end
+        let (item) = _encode3_inner(part * offset, padding, 0, 0)
+        encoded_str[0] = item
+        return _encode_array_inner(str_len - 1, str + 1, encoded_str_len + 1, encoded_str + 1)
+
+        # if str_len == 1:
+        #     memcpy(encoded_str + encoded_str_len, encoded_substr + 28 - len, len)
+        #     return _encode_array_inner(str_len - 1, str + 1, encoded_str_len + len, encoded_str)
+        # else:
+        #     %{ print(ids.len) %}
+        #     memcpy(encoded_str + encoded_str_len, encoded_substr + 28 - len, len - padding)
+        #     return _encode_array_inner(str_len - 1, str + 1, encoded_str_len + len - padding, encoded_str)
+        # end
     end
 
     func encode_single{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(str: felt) -> (encoded_str: felt):
@@ -54,11 +59,7 @@ namespace Base64:
             return (encoded)
         end
 
-        let (q00, r00) = unsigned_div_rem(value, 256)
-        let (q01, r01) = unsigned_div_rem(q00, 256)
-        let (q02, r02) = unsigned_div_rem(q01, 256)
-
-        let (c0, c1, c2, c3) = encode3(r00, r01, r02)
+        let (c0, c1, c2, c3, r) = encode3(value)
         let o = round * 32
         let (o0) = pow2(o)
         let (o1) = pow2(8 + o)
@@ -67,7 +68,7 @@ namespace Base64:
 
         if padding == 1:
             return _encode3_inner(
-                q02, 
+                r, 
                 0, 
                 encoded + c0 * o3 + c1 * o2 + c2 * o1 + '=' * o0, 
                 round + 1
@@ -76,7 +77,7 @@ namespace Base64:
 
         if padding == 2:            
             return _encode3_inner(
-                q02, 
+                r, 
                 0, 
                 encoded + c0 * o3 + c1 * o2 + '=' * o1 + '=' * o0, 
                 round + 1
@@ -84,15 +85,19 @@ namespace Base64:
         end
 
         return _encode3_inner(
-                q02, 
+                r, 
                 0, 
                 encoded + c0 * o3 + c1 * o2 + c2 * o1 + c3 * o0, 
                 round + 1
             )
     end
 
-    func encode3{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(a0: felt, a1: felt, a2: felt) -> (c0: felt, c1: felt, c2: felt, c3: felt):
+    func encode3{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(value: felt) -> (c0: felt, c1: felt, c2: felt, c3: felt, r: felt):
         alloc_locals
+
+        let (q00, a0) = unsigned_div_rem(value, 256)
+        let (q01, a1) = unsigned_div_rem(q00, 256)
+        let (q02, a2) = unsigned_div_rem(q01, 256)
 
         let (_, r00) = unsigned_div_rem(a2, 2 ** 16)
         let r01 = r00 * 2 ** 16
@@ -119,7 +124,7 @@ namespace Base64:
         let (c2) = lookup(c21)
         let (c3) = lookup(c30)
 
-        return (c0=c0, c1=c1, c2=c2, c3=c3)
+        return (c0=c0, c1=c1, c2=c2, c3=c3, r=q02)
     end
 
     func lookup{range_check_ptr}(index: felt) -> (value: felt):

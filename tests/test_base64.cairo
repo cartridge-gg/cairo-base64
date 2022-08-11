@@ -6,7 +6,7 @@ from starkware.cairo.common.registers import get_label_location
 from starkware.cairo.common.invoke import invoke
 from starkware.cairo.common.alloc import alloc
 
-from contracts.base64 import Base64
+from src.base64 import Base64
 
 @view
 func test_base64_encode_single{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
@@ -48,10 +48,6 @@ func test_base64_encode_single{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}()
     return ()
 end
 
-# steps=17839
-# steps=16071
-# steps=12328
-
 # @view
 # func test_base64_encode_array{bitwise_ptr : BitwiseBuiltin*, range_check_ptr}():
 #     alloc_locals
@@ -61,7 +57,9 @@ end
 #     assert man[1] = 'a'
 #     assert man[2] = 'n'
 
-#     let (encoded_str_len, encoded_str) = Base64.encode_array('Man')
+#     let (encoded_str_len, encoded_str) = Base64.encode_array(1, man)
 #     let e0 = encoded_str[0]
 #     assert e0 = 'TWFu'
+
+#     return ()
 # end
