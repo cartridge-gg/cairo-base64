@@ -1,6 +1,6 @@
 # cairo-base64
 
-A library for base64 encoding multi character ascii felts.
+A library for base64 + base64url encoding multi character ascii felts.
 
 ```sh
 'Man' => "TWFu"
