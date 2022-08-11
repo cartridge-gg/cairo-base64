@@ -4,7 +4,7 @@ from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 from starkware.cairo.common.registers import get_label_location
 from starkware.cairo.common.math_cmp import is_le
 
-func encode3{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(value: felt, lookup: felt*) -> (c0: felt, c1: felt, c2: felt, c3: felt, r: felt):
+func _encode3{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(value: felt, lookup: felt*) -> (c0: felt, c1: felt, c2: felt, c3: felt, r: felt):
     alloc_locals
 
     let (q00, a0) = unsigned_div_rem(value, 256)
@@ -57,7 +57,7 @@ func _encode3_inner{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(value: felt, 
         return (encoded)
     end
 
-    let (c0, c1, c2, c3, r) = encode3(value, lookup)
+    let (c0, c1, c2, c3, r) = _encode3(value, lookup)
     let o = round * 32
     let (o0) = pow2(o)
     let (o1) = pow2(8 + o)

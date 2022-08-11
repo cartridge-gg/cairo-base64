@@ -1,7 +1,7 @@
 from starkware.cairo.common.registers import get_label_location
 from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 
-from src.library import encode3, _encode3_inner, calc_offset_padding
+from src.library import _encode3, _encode3_inner, calc_offset_padding
 
 namespace Base64URL:
     func encode_single{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(str: felt) -> (encoded_str: felt):
@@ -18,7 +18,7 @@ namespace Base64URL:
     func encode3{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}(value: felt) -> (c0: felt, c1: felt, c2: felt, c3: felt, r: felt):
         alloc_locals
         let (cb) = get_label_location(lookup)
-        return encode3(value, cb)
+        return _encode3(value, cb)
     end
 
     func lookup{range_check_ptr}(index: felt) -> (value: felt):
